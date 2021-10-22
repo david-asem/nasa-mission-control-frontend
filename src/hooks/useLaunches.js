@@ -11,8 +11,8 @@ function useLaunches(onSuccessSound, onAbortSound, onFailureSound) {
   const [isPendingLaunch, setPendingLaunch] = useState(false);
 
   const getLaunches = useCallback(async () => {
-    const fetchedLaunches = await httpGetLaunches();
-    saveLaunches(fetchedLaunches);
+    const retrievedLaunches = await httpGetLaunches();
+    saveLaunches(retrievedLaunches);
   }, []);
 
   useEffect(() => {
@@ -21,21 +21,20 @@ function useLaunches(onSuccessSound, onAbortSound, onFailureSound) {
 
   const submitLaunch = useCallback(async (e) => {
     e.preventDefault();
-    // setPendingLaunch(true);
     const data = new FormData(e.target);
     const launchDate = new Date(data.get("launch-day"));
-    const mission = data.get("mission-name");
-    const rocket = data.get("rocket-name");
-    const target = data.get("planets-selector");
+    const missionName = data.get("mission-name");
+    const rocketType = data.get("rocket-type");
+    const destinationPlanet = data.get("destination-planet");
     const response = await httpSubmitLaunch({
       launchDate,
-      mission,
-      rocket,
-      target,
+      missionName,
+      rocketType,
+      destinationPlanet,
     });
 
-    // TODO: Set success based on response.
-    const success = false;
+    
+    const success = response.ok;
     if (success) {
       getLaunches();
       setTimeout(() => {
@@ -50,8 +49,8 @@ function useLaunches(onSuccessSound, onAbortSound, onFailureSound) {
   const abortLaunch = useCallback(async (id) => {
     const response = await httpAbortLaunch(id);
 
-    // TODO: Set success based on response.
-    const success = false;
+    
+    const success = response.ok;
     if (success) {
       getLaunches();
       onAbortSound();
